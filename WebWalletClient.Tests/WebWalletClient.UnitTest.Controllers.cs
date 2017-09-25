@@ -14,26 +14,13 @@ namespace WebWalletClient.Tests
     public class HomeControllerTest
     {
         [Fact]
-        public void Index()
-        {
-            // Arrange
-            HomeController _homeController = new HomeController();
-
-            // Act
-            ViewResult result = _homeController.Index() as ViewResult;
-
-            // Assert
-            Assert.NotNull(result);
-        }
-
-        [Fact]
         public void About()
         {
             // Arrange
-            HomeController _homeController = new HomeController();
+            var homeController = new HomeController();
 
             // Act
-            ViewResult result = _homeController.About() as ViewResult;
+            var result = homeController.About() as ViewResult;
 
             // Assert
             Assert.Equal("Your application description page.", result.ViewData["Message"]);
@@ -43,10 +30,23 @@ namespace WebWalletClient.Tests
         public void Contact()
         {
             // Arrange
-            HomeController _homeController = new HomeController();
+            var homeController = new HomeController();
 
             // Act
-            ViewResult result = _homeController.Contact() as ViewResult;
+            var result = homeController.Contact() as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void Index()
+        {
+            // Arrange
+            var homeController = new HomeController();
+
+            // Act
+            var result = homeController.Index() as ViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -57,15 +57,16 @@ namespace WebWalletClient.Tests
     public class BankAccountControllerTest
     {
         [Fact]
-        public async Task IndexAsync()
+        public void CreateBankAccount()
         {
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 
             // Arrange
-            BankAccountController bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
+            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
 
             // Act
-            var result = await bankAccountController.Index();
+            var result = bankAccountController.Create() as ViewResult;
 
             // Assert
             Assert.IsType<ViewResult>(result);
@@ -77,7 +78,8 @@ namespace WebWalletClient.Tests
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 
             // Arrange
-            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
+            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
             var bankAccount = new BankAccount();
             var result = await bankAccountController.Create(bankAccount);
             // Assert
@@ -117,18 +119,17 @@ namespace WebWalletClient.Tests
             Assert.IsType<RedirectToActionResult>(result);
         }
 
-
-
         [Fact]
-        public void CreateBankAccount()
+        public async Task IndexAsync()
         {
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 
             // Arrange
-            BankAccountController bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
+            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
 
             // Act
-            var result = bankAccountController.Create() as ViewResult;
+            var result = await bankAccountController.Index();
 
             // Assert
             Assert.IsType<ViewResult>(result);
@@ -139,28 +140,15 @@ namespace WebWalletClient.Tests
     public class TransactionControllerTest
     {
         [Fact]
-        public async Task IndexAsync()
-        {
-            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-
-            // Arrange
-            var transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
-
-            // Act
-            var result = await transactionController.Index(null);
-
-            // Assert
-            Assert.IsType<ViewResult>(result);
-        }
-
-        [Fact]
         public async Task CreateEditDeleteAsync()
         {
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 
             // Arrange
-            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
-            var transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
+            var bankAccountController = new BankAccountController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
+            var transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
 
             var bankAccount = new BankAccount();
             var result = await bankAccountController.Create(bankAccount);
@@ -216,11 +204,28 @@ namespace WebWalletClient.Tests
             var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 
             // Arrange
-            TransactionController transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object, null, null, null, null, null, null, null, null));
+            var transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
 
             // Act
             var bankAccountId = Guid.NewGuid();
             var result = transactionController.Create(bankAccountId.ToString()) as ViewResult;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task IndexAsync()
+        {
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+
+            // Arrange
+            var transactionController = new TransactionController(new UserManager<ApplicationUser>(userStoreMock.Object,
+                null, null, null, null, null, null, null, null));
+
+            // Act
+            var result = await transactionController.Index(null);
 
             // Assert
             Assert.IsType<ViewResult>(result);
