@@ -36,7 +36,7 @@ namespace WebWalletClient.Models
 
         [Required]
         [Display(Name = "Saldo")]
-        [RegularExpression(@"^(\+|\-|)[0-9]+(\,([0-9]{1,2})?)?$", ErrorMessage =
+        [RegularExpression(@"^(\+)[0-9]+(\,([0-9]{1,2})?)?$", ErrorMessage =
             "{0}t anges med upp till två decimaler. Ex: 4,75")]
         public string Balance { get; set; }
 
