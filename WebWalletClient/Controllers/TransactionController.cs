@@ -31,23 +31,6 @@ namespace WebWalletClient.Controllers
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        private static async Task<List<BankAccount>> GetBankAccounts(HttpResponseMessage response,
-            List<BankAccount> bankAccounts)
-        {
-            if (response.IsSuccessStatusCode)
-                bankAccounts = await response.Content.ReadAsAsync<List<BankAccount>>();
-
-            return bankAccounts;
-        }
-
-        private static async Task<BankAccount> GetBankAccount(HttpResponseMessage response, BankAccount bankAccount)
-        {
-            if (response.IsSuccessStatusCode)
-                bankAccount = await response.Content.ReadAsAsync<BankAccount>();
-
-            return bankAccount;
-        }
-
         private static async Task<List<Transaction>> GetTransactions(HttpResponseMessage response,
             List<Transaction> transactions)
         {
@@ -69,8 +52,7 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> Index(string id)
         {
             var response = await _client.GetAsync($"api/bankaccount");
-            List<BankAccount> bankAccounts = null;
-            bankAccounts = await GetBankAccounts(response, bankAccounts);
+            var bankAccounts = await Utils.GetItems<BankAccount>(response);
             if (bankAccounts == null)
                 return NotFound();
             var ownUserId = Guid.NewGuid(); //null Test to pass xUnit test where User=null
@@ -99,8 +81,7 @@ namespace WebWalletClient.Controllers
             if (id != null)
             {
                 response = await _client.GetAsync($"api/bankaccount/" + id);
-                BankAccount bankAccount = null;
-                bankAccount = await GetBankAccount(response, bankAccount);
+                var bankAccount = await Utils.GetItem<BankAccount>(response);
 
                 response = await _client.GetAsync($"api/transaction/");
                 transactions = await GetTransactions(response, transactions);
@@ -167,8 +148,7 @@ namespace WebWalletClient.Controllers
                 transactionViewModel.Withdraw = !transactionViewModel.Deposition ? transactionViewModel.Amount : "";
 
                 var response = await _client.GetAsync($"api/bankaccount/" + transactionViewModel.BankAccountId);
-                BankAccount bankAccount = null;
-                bankAccount = await GetBankAccount(response, bankAccount);
+                var bankAccount = await Utils.GetItem<BankAccount>(response);
                 if (bankAccount == null)
                     return NotFound();
                 var oldBalance = decimal.Parse(bankAccount.Balance, new CultureInfo("se-SV"));
@@ -241,8 +221,7 @@ namespace WebWalletClient.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _client.GetAsync($"api/transaction/" + id);
-                Transaction oldTransaction = null;
-                oldTransaction = await GetTransaction(response, oldTransaction);
+                var oldTransaction = await Utils.GetItem<Transaction>(response);
                 oldTransaction.Comment = transactionViewModel.Comment;
                 var transactionContent = JsonConvert.SerializeObject(oldTransaction);
                 var buffer = Encoding.UTF8.GetBytes(transactionContent);
@@ -258,8 +237,7 @@ namespace WebWalletClient.Controllers
         private async Task<bool> TransactionExists(Guid id)
         {
             var response = await _client.GetAsync($"api/transaction");
-            List<Transaction> transactions = null;
-            transactions = await GetTransactions(response, transactions);
+            var transactions = await Utils.GetItems<Transaction>(response);
             return transactions.Any(e => e.Id == id);
         }
     }

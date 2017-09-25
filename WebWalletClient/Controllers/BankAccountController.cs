@@ -29,22 +29,6 @@ namespace WebWalletClient.Controllers
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        private static async Task<List<BankAccount>> GetBankAccounts(HttpResponseMessage response,
-            List<BankAccount> bankAccounts)
-        {
-            if (response.IsSuccessStatusCode)
-                bankAccounts = await response.Content.ReadAsAsync<List<BankAccount>>();
-
-            return bankAccounts;
-        }
-
-        private static async Task<BankAccount> GetBankAccount(HttpResponseMessage response, BankAccount bankAccount)
-        {
-            if (response.IsSuccessStatusCode)
-                bankAccount = await response.Content.ReadAsAsync<BankAccount>();
-
-            return bankAccount;
-        }
 
         // GET: BankAccount
         private string GetUserNameFromId(Guid id)
@@ -63,8 +47,7 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> Index()
         {
             var response = await _client.GetAsync($"api/bankaccount");
-            List<BankAccount> bankAccounts = null;
-            bankAccounts = await GetBankAccounts(response, bankAccounts);
+            var bankAccounts = await Utils.GetItems<BankAccount>(response);
             if (bankAccounts == null)
                 return NotFound();
             var ownUserId = Guid.NewGuid(); //null Test to pass xUnit test where User=null
@@ -91,8 +74,7 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
             var response = await _client.GetAsync($"api/bankaccount/" + id);
-            BankAccount bankAccount = null;
-            bankAccount = await GetBankAccount(response, bankAccount);
+            var bankAccount = await Utils.GetItem<BankAccount>(response);
             if (bankAccount == null)
                 return NotFound();
 
@@ -148,8 +130,7 @@ namespace WebWalletClient.Controllers
                 return NotFound();
 
             var response = await _client.GetAsync($"api/bankaccount/" + id);
-            BankAccount bankAccount = null;
-            bankAccount = await GetBankAccount(response, bankAccount);
+            var bankAccount = await Utils.GetItem<BankAccount>(response);
 
             if (bankAccount == null)
                 return NotFound();
@@ -182,8 +163,7 @@ namespace WebWalletClient.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _client.GetAsync($"api/bankaccount/" + id);
-                BankAccount oldBankAccount = null;
-                oldBankAccount = await GetBankAccount(response, oldBankAccount);
+                var oldBankAccount = await Utils.GetItem<BankAccount>(response);
                 if (oldBankAccount == null)
                     return NotFound();
                 oldBankAccount.Comment = bankAccountViewModel.Comment;
@@ -207,8 +187,7 @@ namespace WebWalletClient.Controllers
                 return NotFound();
 
             var response = await _client.GetAsync($"api/bankaccount/" + id);
-            BankAccount bankAccount = null;
-            bankAccount = await GetBankAccount(response, bankAccount);
+            var bankAccount = await Utils.GetItem<BankAccount>(response);
             if (bankAccount == null)
                 return NotFound();
             var bankAccountsViewModel = new BankAccountViewModel
@@ -238,8 +217,7 @@ namespace WebWalletClient.Controllers
         private async Task<bool> BankAccountExists(Guid id)
         {
             var response = await _client.GetAsync($"api/bankaccount");
-            List<BankAccount> bankAccounts = null;
-            bankAccounts = await GetBankAccounts(response, bankAccounts);
+            var bankAccounts = await Utils.GetItems<BankAccount>(response);
             return bankAccounts.Any(e => e.Id == id);
         }
     }
