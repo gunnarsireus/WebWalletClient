@@ -160,15 +160,12 @@ namespace WebWalletClient.Controllers
         {
             if (ModelState.IsValid)
             {
-                var transaction = new Transaction
-                {
-                    Id = Guid.NewGuid(),
-                    BankAccountId = transactionViewModel.BankAccountId,
-                    Comment = transactionViewModel.Comment,
-                    Deposit = transactionViewModel.Deposition ? transactionViewModel.Amount : "",
-                    Withdraw = !transactionViewModel.Deposition ? transactionViewModel.Amount : ""
-                };
-                transactionViewModel.Id = transaction.Id;
+                transactionViewModel.Id = Guid.NewGuid();
+                transactionViewModel.BankAccountId = transactionViewModel.BankAccountId;
+                transactionViewModel.Comment = transactionViewModel.Comment;
+                transactionViewModel.Deposit = transactionViewModel.Deposition ? transactionViewModel.Amount : "";
+                transactionViewModel.Withdraw = !transactionViewModel.Deposition ? transactionViewModel.Amount : "";
+
                 var response = await _client.GetAsync($"api/bankaccount/" + transactionViewModel.BankAccountId);
                 BankAccount bankAccount = null;
                 bankAccount = await GetBankAccount(response, bankAccount);
@@ -197,7 +194,7 @@ namespace WebWalletClient.Controllers
                 bankAccountByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 response = await _client.PutAsync($"api/bankaccount/0", bankAccountByteContent);
 
-                var transactionContent = JsonConvert.SerializeObject(transaction);
+                var transactionContent = JsonConvert.SerializeObject(transactionViewModel);
                 buffer = Encoding.UTF8.GetBytes(transactionContent);
                 var transactionByteContent = new ByteArrayContent(buffer);
                 transactionByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
