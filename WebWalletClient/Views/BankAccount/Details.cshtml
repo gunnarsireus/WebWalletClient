@@ -1,0 +1,55 @@
+@using WebWalletClient.Models.BankAccountViewModel
+@model WebWalletClient.Models.BankAccountViewModel.BankAccountViewModel
+
+@{
+    ViewData["Title"] = "Detaljer";
+}
+
+<h2>Detaljer</h2>
+
+<div>
+    <h4>Bankkonto</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CreationTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreationTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InterestRate) 
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InterestRate) %
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Balance)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Balance)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
+    <a asp-action="Index">Tillbaka till listan</a> 
+</div>

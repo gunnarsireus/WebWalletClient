@@ -1,0 +1,54 @@
+@model WebWalletClient.Models.TransactionViewModel.TransactionViewModel
+
+@{
+    ViewData["Title"] = "Skapa ny";
+}
+<script type="text/javascript">
+    function clearErrors() {
+        $('.validation-summary-errors').empty();
+    };
+</script>
+<h2>Skapa ny</h2>
+
+<h4>Transaktion</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="CreateForm" onmousedown="clearErrors()">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="BankAccountId" class="control-label"></label>
+                <input asp-for="BankAccountId" class="form-control" readonly="readonly" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Comment" class="control-label"></label>
+                <input asp-for="Comment" class="form-control" />
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label asp-for="Deposition">
+                        <input asp-for="Deposition" />
+                        @Html.DisplayNameFor(m => m.Deposition)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Skapa" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Tillbaka till listan</a> 
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
