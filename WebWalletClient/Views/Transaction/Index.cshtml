@@ -7,7 +7,7 @@
     <tr class="page-header">Transaktioner f&#246;r konto:</tr>
     <tr>
         <td class="table-footnote">
-            @Html.DropDownList("TransactionsForBankAccount", Model.BankAccounts, new { onchange = "ShowTransactions()" })
+            @Html.DropDownList("TransactionsForBankAccount", Model.BankAccounts, new {onchange = "ShowTransactions()"})
         </td>
     </tr>
 </table>
@@ -21,7 +21,7 @@
     {
         var createString = "Create/" + ViewBag.BankAccountId;
         <p>
-            <a asp-action="@createString">Skapa ny</a> 
+            <a asp-action="@createString">Skapa ny</a>
         </p>
     }
 }
@@ -29,60 +29,60 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Transactions[0].BankAccountId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Transactions[0].CreationTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Transactions[0].Comment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Transactions[0].Deposit)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Transactions[0].Withdraw)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].BankAccountId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].CreationTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Comment)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Deposit)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Withdraw)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Transactions)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BankAccountId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreationTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Comment)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Deposit)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Withdraw)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">&#196;ndra</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
-                </td>
-            </tr>
-        }
+    @foreach (var item in Model.Transactions)
+    {
         <tr>
-            <td></td>
-            <td></td>
-            <th>
-                Saldo:
-            </th>
-            <th colspan="2">
-                @ViewBag.Saldo
-            </th>
-            <td></td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BankAccountId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comment)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Deposit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Withdraw)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">&#196;ndra</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
+            </td>
         </tr>
+    }
+    <tr>
+        <td></td>
+        <td></td>
+        <th>
+            Saldo:
+        </th>
+        <th colspan="2">
+            @ViewBag.Saldo
+        </th>
+        <td></td>
+    </tr>
     </tbody>
 </table>

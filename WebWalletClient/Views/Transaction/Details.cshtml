@@ -1,4 +1,4 @@
-@model WebWalletClient.Models.Transaction
+@model Transaction
 
 @{
     ViewData["Title"] = "Details";
@@ -8,7 +8,7 @@
 
 <div>
     <h4>Transaktion</h4>
-    <hr />
+    <hr/>
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.BankAccountId)
@@ -44,5 +44,5 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
-    <a asp-action="Index">Tillbaka till listan</a> 
+    <a asp-action="Index">Tillbaka till listan</a>
 </div>

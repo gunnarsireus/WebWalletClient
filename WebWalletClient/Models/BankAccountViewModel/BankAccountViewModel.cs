@@ -2,10 +2,9 @@
 
 namespace WebWalletClient.Models.BankAccountViewModel
 {
-    public class BankAccountViewModel:BankAccount
+    public class BankAccountViewModel : BankAccount
     {
         [Display(Name = "Användare")]
         public string Username { get; set; }
-
     }
 }

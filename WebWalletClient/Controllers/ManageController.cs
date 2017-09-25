@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using WebWalletClient.Models;
 using WebWalletClient.Models.ManageViewModels;
 using WebWalletClient.Services;
@@ -20,20 +18,19 @@ namespace WebWalletClient.Controllers
     [Route("[controller]/[action]")]
     public class ManageController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UrlEncoder _urlEncoder;
-
-        private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ManageController(
-          UserManager<ApplicationUser> userManager,
-          SignInManager<ApplicationUser> signInManager,
-          IEmailSender emailSender,
-          ILogger<ManageController> logger,
-          UrlEncoder urlEncoder)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender,
+            ILogger<ManageController> logger,
+            UrlEncoder urlEncoder)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,9 +47,7 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var model = new IndexViewModel
             {
@@ -71,24 +66,19 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> Index(IndexViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var email = user.Email;
             if (model.Email != email)
             {
                 var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
                 if (!setEmailResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
-                }
+                    throw new ApplicationException(
+                        $"Unexpected error occurred setting email for user with ID '{user.Id}'.");
             }
 
             var phoneNumber = user.PhoneNumber;
@@ -96,9 +86,8 @@ namespace WebWalletClient.Controllers
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
+                    throw new ApplicationException(
+                        $"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
             }
 
             StatusMessage = "Your profile has been updated";
@@ -110,15 +99,11 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> SendVerificationEmail(IndexViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
@@ -134,17 +119,13 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
             if (!hasPassword)
-            {
                 return RedirectToAction(nameof(SetPassword));
-            }
 
-            var model = new ChangePasswordViewModel { StatusMessage = StatusMessage };
+            var model = new ChangePasswordViewModel {StatusMessage = StatusMessage};
             return View(model);
         }
 
@@ -153,24 +134,21 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            var changePasswordResult =
+                await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
             if (!changePasswordResult.Succeeded)
             {
                 AddErrors(changePasswordResult);
                 return View(model);
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            await _signInManager.SignInAsync(user, false);
             _logger.LogInformation("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
 
@@ -182,18 +160,14 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
 
             if (hasPassword)
-            {
                 return RedirectToAction(nameof(ChangePassword));
-            }
 
-            var model = new SetPasswordViewModel { StatusMessage = StatusMessage };
+            var model = new SetPasswordViewModel {StatusMessage = StatusMessage};
             return View(model);
         }
 
@@ -202,15 +176,11 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
             if (!addPasswordResult.Succeeded)
@@ -219,7 +189,7 @@ namespace WebWalletClient.Controllers
                 return View(model);
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            await _signInManager.SignInAsync(user, false);
             StatusMessage = "Your password has been set.";
 
             return RedirectToAction(nameof(SetPassword));
@@ -230,11 +200,9 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
-            var model = new ExternalLoginsViewModel { CurrentLogins = await _userManager.GetLoginsAsync(user) };
+            var model = new ExternalLoginsViewModel {CurrentLogins = await _userManager.GetLoginsAsync(user)};
             model.OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
                 .Where(auth => model.CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
                 .ToList();
@@ -253,7 +221,9 @@ namespace WebWalletClient.Controllers
 
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action(nameof(LinkLoginCallback));
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
+            var properties =
+                _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl,
+                    _userManager.GetUserId(User));
             return new ChallengeResult(provider, properties);
         }
 
@@ -262,21 +232,17 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
             if (info == null)
-            {
-                throw new ApplicationException($"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
-            }
+                throw new ApplicationException(
+                    $"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
 
             var result = await _userManager.AddLoginAsync(user, info);
             if (!result.Succeeded)
-            {
-                throw new ApplicationException($"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
-            }
+                throw new ApplicationException(
+                    $"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -291,17 +257,14 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var result = await _userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey);
             if (!result.Succeeded)
-            {
-                throw new ApplicationException($"Unexpected error occurred removing external login for user with ID '{user.Id}'.");
-            }
+                throw new ApplicationException(
+                    $"Unexpected error occurred removing external login for user with ID '{user.Id}'.");
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            await _signInManager.SignInAsync(user, false);
             StatusMessage = "The external login was removed.";
             return RedirectToAction(nameof(ExternalLogins));
         }
@@ -311,15 +274,13 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var model = new TwoFactorAuthenticationViewModel
             {
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
                 Is2faEnabled = user.TwoFactorEnabled,
-                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user)
             };
 
             return View(model);
@@ -330,14 +291,10 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             if (!user.TwoFactorEnabled)
-            {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
-            }
 
             return View(nameof(Disable2fa));
         }
@@ -348,15 +305,11 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
             if (!disable2faResult.Succeeded)
-            {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
-            }
 
             _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
             return RedirectToAction(nameof(TwoFactorAuthentication));
@@ -367,9 +320,7 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
             if (string.IsNullOrEmpty(unformattedKey))
@@ -392,15 +343,11 @@ namespace WebWalletClient.Controllers
         public async Task<IActionResult> EnableAuthenticator(EnableAuthenticatorViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             // Strip spaces and hypens
             var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
@@ -431,9 +378,7 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             await _userManager.SetTwoFactorEnabledAsync(user, false);
             await _userManager.ResetAuthenticatorKeyAsync(user);
@@ -447,17 +392,14 @@ namespace WebWalletClient.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             if (!user.TwoFactorEnabled)
-            {
-                throw new ApplicationException($"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled.");
-            }
+                throw new ApplicationException(
+                    $"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled.");
 
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-            var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
+            var model = new GenerateRecoveryCodesViewModel {RecoveryCodes = recoveryCodes.ToArray()};
 
             _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
 
@@ -469,24 +411,20 @@ namespace WebWalletClient.Controllers
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
-            {
                 ModelState.AddModelError(string.Empty, error.Description);
-            }
         }
 
         private string FormatKey(string unformattedKey)
         {
             var result = new StringBuilder();
-            int currentPosition = 0;
+            var currentPosition = 0;
             while (currentPosition + 4 < unformattedKey.Length)
             {
                 result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
                 currentPosition += 4;
             }
             if (currentPosition < unformattedKey.Length)
-            {
                 result.Append(unformattedKey.Substring(currentPosition));
-            }
 
             return result.ToString().ToLowerInvariant();
         }

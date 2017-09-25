@@ -1,4 +1,3 @@
-@using WebWalletClient.Models.BankAccountViewModel
 @model WebWalletClient.Models.BankAccountViewModel.BankAccountViewModel
 
 @{
@@ -9,7 +8,7 @@
 
 <div>
     <h4>Bankkonto</h4>
-    <hr />
+    <hr/>
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Id)
@@ -30,7 +29,7 @@
             @Html.DisplayFor(model => model.CreationTime)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.InterestRate) 
+            @Html.DisplayNameFor(model => model.InterestRate)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.InterestRate) %
@@ -51,5 +50,5 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
-    <a asp-action="Index">Tillbaka till listan</a> 
+    <a asp-action="Index">Tillbaka till listan</a>
 </div>
