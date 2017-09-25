@@ -1,15 +1,15 @@
 using System;
-using Xunit;
-using Microsoft.AspNetCore.Mvc;
-using WebWalletClient.Controllers;
-using Microsoft.AspNetCore.Identity;
-using WebWalletClient.Models;
-using Moq;
 using System.Threading.Tasks;
-using WebWalletClient.Models.TransactionViewModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using WebWalletClient.Controllers;
+using WebWalletClient.Models;
 using WebWalletClient.Models.BankAccountViewModel;
+using WebWalletClient.Models.TransactionViewModel;
+using Xunit;
 
-namespace WebWalletClient.Tests.Controllers
+namespace WebWalletClient.Tests
 {
     public class HomeControllerTest
     {
