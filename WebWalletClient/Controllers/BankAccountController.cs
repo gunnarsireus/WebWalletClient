@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,18 +11,11 @@ namespace WebWalletClient.Controllers
 {
 	public class BankAccountController : Controller
 	{
-		private readonly HttpClient _client;
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public BankAccountController(UserManager<ApplicationUser> userManager)
 		{
 			_userManager = userManager;
-			_client = new HttpClient
-			{
-				BaseAddress = new Uri("http://localhost:54411//")
-			};
-			_client.DefaultRequestHeaders.Accept.Clear();
-			_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 		}
 
 
@@ -44,7 +35,7 @@ namespace WebWalletClient.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			var bankAccounts = await Utils.Get<List<BankAccount>>(_client, "api/bankaccount");
+			var bankAccounts = await Utils.Get<List<BankAccount>>("api/bankaccount");
 			if (bankAccounts == null)
 				return NotFound();
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
@@ -71,7 +62,7 @@ namespace WebWalletClient.Controllers
 			if (id == null)
 				return NotFound();
 
-			var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
+			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 			if (bankAccount == null)
 				return NotFound();
 
@@ -109,7 +100,7 @@ namespace WebWalletClient.Controllers
 			if (ModelState.IsValid)
 			{
 				bankAccount.Id = Guid.NewGuid();
-				var response = await Utils.Post<BankAccount>(_client, "api/bankaccount/", bankAccount);
+				var response = await Utils.Post<BankAccount>("api/bankaccount/", bankAccount);
 
 				return RedirectToAction(nameof(Index));
 			}
@@ -122,7 +113,7 @@ namespace WebWalletClient.Controllers
 			if (id == null)
 				return NotFound();
 
-			var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
+			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 
 			if (bankAccount == null)
 				return NotFound();
@@ -154,12 +145,12 @@ namespace WebWalletClient.Controllers
 
 			if (ModelState.IsValid)
 			{
-				var oldBankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
+				var oldBankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 				if (oldBankAccount == null)
 					return NotFound();
 				oldBankAccount.Comment = bankAccountViewModel.Comment;
 				oldBankAccount.InterestRate = bankAccountViewModel.InterestRate;
-				oldBankAccount = await Utils.Put<BankAccount>(_client, $"api/bankaccount/0", oldBankAccount);
+				oldBankAccount = await Utils.Put<BankAccount>($"api/bankaccount/0", oldBankAccount);
 
 				return RedirectToAction(nameof(Index));
 			}
@@ -172,7 +163,7 @@ namespace WebWalletClient.Controllers
 			if (id == null)
 				return NotFound();
 
-			var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
+			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 			if (bankAccount == null)
 				return NotFound();
 			var bankAccountsViewModel = new BankAccountViewModel
@@ -195,13 +186,13 @@ namespace WebWalletClient.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteConfirmed(Guid id)
 		{
-			var bankAccount = await Utils.Delete<BankAccount>(_client, "api/bankaccount/" + id);
+			var bankAccount = await Utils.Delete<BankAccount>("api/bankaccount/" + id);
 			return RedirectToAction(nameof(Index));
 		}
 
 		private async Task<bool> BankAccountExists(Guid id)
 		{
-			var bankAccounts = await Utils.Get<List<BankAccount>>(_client, "api/bankaccount");
+			var bankAccounts = await Utils.Get<List<BankAccount>>("api/bankaccount");
 			return bankAccounts.Any(e => e.Id == id);
 		}
 	}
