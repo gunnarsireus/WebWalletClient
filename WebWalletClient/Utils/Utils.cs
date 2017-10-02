@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
 
 namespace WebWalletClient
 {
@@ -45,6 +44,5 @@ namespace WebWalletClient
 			var content = await response.Content.ReadAsStringAsync();
 			return await Task.Run(() => JsonConvert.DeserializeObject<T>(content));
 		}
-
 	}
 }
