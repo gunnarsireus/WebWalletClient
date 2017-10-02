@@ -46,7 +46,7 @@ namespace WebWalletClient.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var bankAccounts = await Utils.GetItems<BankAccount>(_client, "api/bankaccount");
+            var bankAccounts = await Utils.Get<List<BankAccount>>(_client, "api/bankaccount");
             if (bankAccounts == null)
                 return NotFound();
             var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
@@ -73,7 +73,7 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
 
-            var bankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
+            var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
             if (bankAccount == null)
                 return NotFound();
 
@@ -111,11 +111,7 @@ namespace WebWalletClient.Controllers
             if (ModelState.IsValid)
             {
                 bankAccount.Id = Guid.NewGuid();
-                var bankAccountContent = JsonConvert.SerializeObject(bankAccount);
-                var buffer = Encoding.UTF8.GetBytes(bankAccountContent);
-                var bankAccountByteContent = new ByteArrayContent(buffer);
-                bankAccountByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                var response = await _client.PostAsync("api/bankaccount/", bankAccountByteContent);
+                var response = await Utils.Post<BankAccount>(_client,"api/bankaccount/", bankAccount);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -128,7 +124,7 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
 
-            var bankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
+            var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
 
             if (bankAccount == null)
                 return NotFound();
@@ -160,7 +156,7 @@ namespace WebWalletClient.Controllers
 
             if (ModelState.IsValid)
             {
-                var oldBankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
+                var oldBankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
                 if (oldBankAccount == null)
                     return NotFound();
                 oldBankAccount.Comment = bankAccountViewModel.Comment;
@@ -178,7 +174,7 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
 
-            var bankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
+            var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
 			if (bankAccount == null)
                 return NotFound();
             var bankAccountsViewModel = new BankAccountViewModel
@@ -207,7 +203,7 @@ namespace WebWalletClient.Controllers
 
         private async Task<bool> BankAccountExists(Guid id)
         {
-            var bankAccounts = await Utils.GetItems<BankAccount>(_client, "api/bankaccount");
+            var bankAccounts = await Utils.Get<List<BankAccount>>(_client, "api/bankaccount");
             return bankAccounts.Any(e => e.Id == id);
         }
     }

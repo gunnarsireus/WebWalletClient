@@ -8,25 +8,11 @@ namespace WebWalletClient
 {
 	public static class Utils
 	{
-		public static async Task<List<T>> GetItems<T>(HttpClient client, string url)
+		public static async Task<T> Get<T>(HttpClient client, string url)
 		{
 			var response = await client.GetAsync(url);
-			var items = new List<T>();
-			if (response.IsSuccessStatusCode)
-				items = await response.Content.ReadAsAsync<List<T>>();
-
-			return items;
-		}
-
-
-		public static async Task<T> GetItem<T>(HttpClient client, string url)
-		{
-			var response = await client.GetAsync(url);
-			var item = default(T);
-			if (response.IsSuccessStatusCode)
-				item = await response.Content.ReadAsAsync<T>();
-
-			return item;
+			var content = await response.Content.ReadAsStringAsync();
+			return await Task.Run(() => JsonConvert.DeserializeObject<T>(content));
 		}
 
 		// INSERT
@@ -39,6 +25,8 @@ namespace WebWalletClient
 			var content = await response.Content.ReadAsStringAsync();
 			return await Task.Run(() => JsonConvert.DeserializeObject<T>(content));
 		}
+
+		// UPDATE
 		public static async Task<T> Put<T>(HttpClient client, string url, object data)
 		{
 			var httpContent = new StringContent(JsonConvert.SerializeObject(data));
@@ -48,6 +36,8 @@ namespace WebWalletClient
 			var content = await response.Content.ReadAsStringAsync();
 			return await Task.Run(() => JsonConvert.DeserializeObject<T>(content));
 		}
+
+		// DELETE
 
 		public static async Task<T> Delete<T>(HttpClient client, string url)
 		{

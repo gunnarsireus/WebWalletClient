@@ -32,7 +32,7 @@ namespace WebWalletClient.Controllers
         // GET: Transaction
         public async Task<IActionResult> Index(string id)
         {
-            var bankAccounts = await Utils.GetItems<BankAccount>(_client, "api/bankaccount");
+            var bankAccounts = await Utils.Get<List<BankAccount>>(_client, "api/bankaccount");
             if (bankAccounts == null)
                 return NotFound();
             var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
@@ -60,9 +60,9 @@ namespace WebWalletClient.Controllers
 
             if (id != null)
             {
-                var bankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
+                var bankAccount = await Utils.Get<BankAccount>(_client, "api/bankaccount/" + id);
 
-				transactions = await Utils.GetItems<Transaction>(_client, "api/transaction/");
+				transactions = await Utils.Get<List<Transaction>>(_client, "api/transaction/");
                 transactions = transactions.Where(o => o.BankAccountId == bankAccount.Id).ToList();
             }
 
@@ -85,7 +85,7 @@ namespace WebWalletClient.Controllers
                 return NotFound();
 
             Transaction transaction = null;
-            transaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
+            transaction = await Utils.Get<Transaction>(_client, "api/transaction/" + id);
             if (transaction == null)
                 return NotFound();
 
@@ -124,7 +124,7 @@ namespace WebWalletClient.Controllers
                 transactionViewModel.Deposit = transactionViewModel.Deposition ? transactionViewModel.Amount : "";
                 transactionViewModel.Withdraw = !transactionViewModel.Deposition ? transactionViewModel.Amount : "";
 
-                var bankAccount = await Utils.GetItem<BankAccount>(_client,"api/bankaccount/" + transactionViewModel.BankAccountId);
+                var bankAccount = await Utils.Get<BankAccount>(_client,"api/bankaccount/" + transactionViewModel.BankAccountId);
                 if (bankAccount == null)
                     return NotFound();
                 var oldBalance = decimal.Parse(bankAccount.Balance, new CultureInfo("se-SV"));
@@ -160,7 +160,7 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
 
-            var transaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
+            var transaction = await Utils.Get<Transaction>(_client, "api/transaction/" + id);
             if (transaction == null)
                 return NotFound();
             var transactionViewmodel = new TransactionViewModel
@@ -188,7 +188,7 @@ namespace WebWalletClient.Controllers
 
             if (ModelState.IsValid)
             {
-                var oldTransaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
+                var oldTransaction = await Utils.Get<Transaction>(_client, "api/transaction/" + id);
                 oldTransaction.Comment = transactionViewModel.Comment;
 	            var transaction = Utils.Put<Transaction>(_client, "api/transaction/0", oldTransaction).Result;
 
@@ -199,7 +199,7 @@ namespace WebWalletClient.Controllers
 
         private async Task<bool> TransactionExists(Guid id)
         {
-            var transactions = await Utils.GetItems<Transaction>(_client, "api/transaction/" + id);
+            var transactions = await Utils.Get<List<Transaction>>(_client, "api/transaction/" + id);
             return transactions.Any(e => e.Id == id);
         }
     }
