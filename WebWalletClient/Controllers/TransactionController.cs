@@ -4,12 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using WebWalletClient.Models;
 using WebWalletClient.Models.TransactionViewModel;
 
@@ -31,31 +29,13 @@ namespace WebWalletClient.Controllers
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        private static async Task<List<Transaction>> GetTransactions(HttpResponseMessage response,
-            List<Transaction> transactions)
-        {
-            if (response.IsSuccessStatusCode)
-                transactions = await response.Content.ReadAsAsync<List<Transaction>>();
-
-            return transactions;
-        }
-
-        private static async Task<Transaction> GetTransaction(HttpResponseMessage response, Transaction transaction)
-        {
-            if (response.IsSuccessStatusCode)
-                transaction = await response.Content.ReadAsAsync<Transaction>();
-
-            return transaction;
-        }
-
         // GET: Transaction
         public async Task<IActionResult> Index(string id)
         {
-            var response = await _client.GetAsync($"api/bankaccount");
-            var bankAccounts = await Utils.GetItems<BankAccount>(response);
+            var bankAccounts = await Utils.GetItems<BankAccount>(_client, "api/bankaccount");
             if (bankAccounts == null)
                 return NotFound();
-            var ownUserId = Guid.NewGuid(); //null Test to pass xUnit test where User=null
+            var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
             if (User != null) ownUserId = new Guid(_userManager.GetUserId(User));
 
             bankAccounts = bankAccounts.Where(o => o.OwnerId == ownUserId).ToList();
@@ -80,11 +60,9 @@ namespace WebWalletClient.Controllers
 
             if (id != null)
             {
-                response = await _client.GetAsync($"api/bankaccount/" + id);
-                var bankAccount = await Utils.GetItem<BankAccount>(response);
+                var bankAccount = await Utils.GetItem<BankAccount>(_client, "api/bankaccount/" + id);
 
-                response = await _client.GetAsync($"api/transaction/");
-                transactions = await GetTransactions(response, transactions);
+				transactions = await Utils.GetItems<Transaction>(_client, "api/transaction/");
                 transactions = transactions.Where(o => o.BankAccountId == bankAccount.Id).ToList();
             }
 
@@ -106,9 +84,8 @@ namespace WebWalletClient.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _client.GetAsync($"api/transaction/" + id);
             Transaction transaction = null;
-            transaction = await GetTransaction(response, transaction);
+            transaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
             if (transaction == null)
                 return NotFound();
 
@@ -147,8 +124,7 @@ namespace WebWalletClient.Controllers
                 transactionViewModel.Deposit = transactionViewModel.Deposition ? transactionViewModel.Amount : "";
                 transactionViewModel.Withdraw = !transactionViewModel.Deposition ? transactionViewModel.Amount : "";
 
-                var response = await _client.GetAsync($"api/bankaccount/" + transactionViewModel.BankAccountId);
-                var bankAccount = await Utils.GetItem<BankAccount>(response);
+                var bankAccount = await Utils.GetItem<BankAccount>(_client,"api/bankaccount/" + transactionViewModel.BankAccountId);
                 if (bankAccount == null)
                     return NotFound();
                 var oldBalance = decimal.Parse(bankAccount.Balance, new CultureInfo("se-SV"));
@@ -168,19 +144,12 @@ namespace WebWalletClient.Controllers
                     }
                 }
 
-                var bankAccountContent = JsonConvert.SerializeObject(bankAccount);
-                var buffer = Encoding.UTF8.GetBytes(bankAccountContent);
-                var bankAccountByteContent = new ByteArrayContent(buffer);
-                bankAccountByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                response = await _client.PutAsync($"api/bankaccount/0", bankAccountByteContent);
+	            bankAccount = Utils.Put<BankAccount>(_client, "api/bankaccount/0",bankAccount).Result;
 
-                var transactionContent = JsonConvert.SerializeObject(transactionViewModel);
-                buffer = Encoding.UTF8.GetBytes(transactionContent);
-                var transactionByteContent = new ByteArrayContent(buffer);
-                transactionByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                response = await _client.PostAsync($"api/transaction/", transactionByteContent);
+	            var transaction = Utils.Post<Transaction>(_client, "api/transaction/", transactionViewModel).Result;
 
-                return RedirectToAction("Index", new {id = transactionViewModel.BankAccountId});
+
+				return RedirectToAction("Index", new {id = transactionViewModel.BankAccountId});
             }
             return View(transactionViewModel);
         }
@@ -190,9 +159,8 @@ namespace WebWalletClient.Controllers
         {
             if (id == null)
                 return NotFound();
-            var response = await _client.GetAsync($"api/transaction/" + id);
-            Transaction transaction = null;
-            transaction = await GetTransaction(response, transaction);
+
+            var transaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
             if (transaction == null)
                 return NotFound();
             var transactionViewmodel = new TransactionViewModel
@@ -220,24 +188,18 @@ namespace WebWalletClient.Controllers
 
             if (ModelState.IsValid)
             {
-                var response = await _client.GetAsync($"api/transaction/" + id);
-                var oldTransaction = await Utils.GetItem<Transaction>(response);
+                var oldTransaction = await Utils.GetItem<Transaction>(_client, "api/transaction/" + id);
                 oldTransaction.Comment = transactionViewModel.Comment;
-                var transactionContent = JsonConvert.SerializeObject(oldTransaction);
-                var buffer = Encoding.UTF8.GetBytes(transactionContent);
-                var transactionByteContent = new ByteArrayContent(buffer);
-                transactionByteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                response = await _client.PutAsync($"api/transaction/0", transactionByteContent);
+	            var transaction = Utils.Put<Transaction>(_client, "api/transaction/0", oldTransaction).Result;
 
-                return RedirectToAction("Index", new {id = transactionViewModel.BankAccountId});
+				return RedirectToAction("Index", new {id = transactionViewModel.BankAccountId});
             }
             return View(transactionViewModel);
         }
 
         private async Task<bool> TransactionExists(Guid id)
         {
-            var response = await _client.GetAsync($"api/transaction");
-            var transactions = await Utils.GetItems<Transaction>(response);
+            var transactions = await Utils.GetItems<Transaction>(_client, "api/transaction/" + id);
             return transactions.Any(e => e.Id == id);
         }
     }
