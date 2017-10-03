@@ -75,8 +75,7 @@ namespace WebWalletClient.Controllers
 			if (id == null)
 				return NotFound();
 
-			Transaction transaction = null;
-			transaction = await Utils.Get<Transaction>("api/transaction/" + id);
+			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			if (transaction == null)
 				return NotFound();
 
@@ -86,7 +85,7 @@ namespace WebWalletClient.Controllers
 		// GET: Transaction/Create
 		public IActionResult Create(string id)
 		{
-			if (TempData != null && TempData["CustomError"] != null)
+			if (TempData?["CustomError"] != null)
 				ModelState.AddModelError(string.Empty, TempData["CustomError"].ToString());
 			if (id == null)
 				return View();

@@ -12,7 +12,6 @@ namespace WebWalletClient.Controllers
 	public class BankAccountController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
-
 		public BankAccountController(UserManager<ApplicationUser> userManager)
 		{
 			_userManager = userManager;
