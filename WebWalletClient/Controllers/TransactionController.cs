@@ -78,8 +78,8 @@ namespace WebWalletClient.Controllers
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			if (transaction == null)
 				return NotFound();
-
-			return View(transaction);
+            ViewBag.BankAccountId = transaction.BankAccountId;
+            return View(transaction);
 		}
 
 		// GET: Transaction/Create
@@ -95,7 +95,8 @@ namespace WebWalletClient.Controllers
 				BankAccountId = iid,
 				Deposition = true
 			};
-			return View(transactionViewModel);
+            ViewBag.BankAccountId = iid;
+            return View(transactionViewModel);
 		}
 
 		// POST: Transaction/Create
@@ -141,7 +142,8 @@ namespace WebWalletClient.Controllers
 
 				return RedirectToAction("Index", new { id = transactionViewModel.BankAccountId });
 			}
-			return View(transactionViewModel);
+            ViewBag.BankAccountId = transactionViewModel.BankAccountId;
+            return View(transactionViewModel);
 		}
 
 		// GET: Transaction/Edit/5
@@ -153,7 +155,7 @@ namespace WebWalletClient.Controllers
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			if (transaction == null)
 				return NotFound();
-			var transactionViewmodel = new TransactionViewModel
+			var transactionViewModel = new TransactionViewModel
 			{
 				Id = transaction.Id,
 				BankAccountId = transaction.BankAccountId,
@@ -162,7 +164,8 @@ namespace WebWalletClient.Controllers
 				Amount = transaction.Deposit == "" ? transaction.Withdraw : transaction.Deposit,
 				Deposition = transaction.Deposit != ""
 			};
-			return View(transactionViewmodel);
+            ViewBag.BankAccountId = transactionViewModel.BankAccountId;
+            return View(transactionViewModel);
 		}
 
 		// POST: Transaction/Edit/5

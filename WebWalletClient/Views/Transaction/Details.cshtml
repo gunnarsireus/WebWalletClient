@@ -8,7 +8,7 @@
 
 <div>
     <h4>Transaktion</h4>
-    <hr/>
+    <hr />
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.BankAccountId)
@@ -43,6 +43,9 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
-    <a asp-action="Index">Tillbaka till listan</a>
+    @{var listString = "Index/" + ViewBag.BankAccountId; }
+    <p>
+        <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
+        <a asp-action="@listString">Tillbaka till listan</a>
+    </p>
 </div>
