@@ -134,7 +134,7 @@ namespace WebWalletClient.Controllers
 					}
 				}
 
-				bankAccount = Utils.Put<BankAccount>("api/bankaccount/0", bankAccount).Result;
+				bankAccount = Utils.Put<BankAccount>("api/bankaccount/" + bankAccount.Id.ToString(), bankAccount).Result;
 
 				var transaction = Utils.Post<Transaction>("api/transaction/", transactionViewModel).Result;
 
@@ -180,7 +180,7 @@ namespace WebWalletClient.Controllers
 			{
 				var oldTransaction = await Utils.Get<Transaction>("api/transaction/" + id);
 				oldTransaction.Comment = transactionViewModel.Comment;
-				var transaction = Utils.Put<Transaction>("api/transaction/0", oldTransaction).Result;
+				var transaction = Utils.Put<Transaction>("api/transaction/" + oldTransaction.BankAccountId.ToString(), oldTransaction).Result;
 
 				return RedirectToAction("Index", new { id = transactionViewModel.BankAccountId });
 			}
