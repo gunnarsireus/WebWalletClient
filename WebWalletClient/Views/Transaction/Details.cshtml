@@ -43,7 +43,7 @@
     </dl>
 </div>
 <div>
-    @{var listString = "Index/" + ViewBag.BankAccountId; }
+    @{var listString = "Index/" + Model.BankAccountId; }
     <p>
         <a asp-action="Edit" asp-route-id="@Model.Id">&#196;ndra</a> |
         <a asp-action="@listString">Tillbaka till listan</a>

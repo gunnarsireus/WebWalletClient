@@ -64,9 +64,9 @@ namespace WebWalletClient.Controllers
 				Transactions = transactions
 			};
 
-			ViewBag.BankAccountId = id;
 			ViewBag.Saldo = bankAccounts.SingleOrDefault(o => o.Id.ToString() == id)?.Balance;
-			return View(transactionListViewModel);
+            ViewBag.BankAccountId = id;
+            return View(transactionListViewModel);
 		}
 
 		// GET: Transaction/Details/5
@@ -78,7 +78,6 @@ namespace WebWalletClient.Controllers
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			if (transaction == null)
 				return NotFound();
-            ViewBag.BankAccountId = transaction.BankAccountId;
             return View(transaction);
 		}
 
@@ -95,7 +94,6 @@ namespace WebWalletClient.Controllers
 				BankAccountId = iid,
 				Deposition = true
 			};
-            ViewBag.BankAccountId = iid;
             return View(transactionViewModel);
 		}
 
@@ -142,7 +140,6 @@ namespace WebWalletClient.Controllers
 
 				return RedirectToAction("Index", new { id = transactionViewModel.BankAccountId });
 			}
-            ViewBag.BankAccountId = transactionViewModel.BankAccountId;
             return View(transactionViewModel);
 		}
 
@@ -164,7 +161,6 @@ namespace WebWalletClient.Controllers
 				Amount = transaction.Deposit == "" ? transaction.Withdraw : transaction.Deposit,
 				Deposition = transaction.Deposit != ""
 			};
-            ViewBag.BankAccountId = transactionViewModel.BankAccountId;
             return View(transactionViewModel);
 		}
 
