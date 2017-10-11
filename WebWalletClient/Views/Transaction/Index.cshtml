@@ -7,7 +7,7 @@
     <tr class="page-header">Transaktioner f&#246;r konto:</tr>
     <tr>
         <td class="table-footnote">
-            @Html.DropDownList("TransactionsForBankAccount", Model.BankAccounts, new { onchange = "ShowTransactions()" })
+            @Html.DropDownList("TransactionsForBankAccount", Model.BankAccountSelectList, new { onchange = "ShowTransactions()" })
         </td>
     </tr>
 </table>

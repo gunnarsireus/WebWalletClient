@@ -5,7 +5,7 @@ namespace WebWalletClient.Models.TransactionViewModel
 {
     public class TransactionListViewModel : Transaction
     {
-        public List<SelectListItem> BankAccounts { get; set; }
+        public List<SelectListItem> BankAccountSelectList { get; set; }
         public List<Transaction> Transactions { get; set; }
     }
 }
