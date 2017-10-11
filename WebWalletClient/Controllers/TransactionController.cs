@@ -24,8 +24,7 @@ namespace WebWalletClient.Controllers
 		public async Task<IActionResult> Index(string id)
 		{
 			var bankAccounts = await Utils.Get<List<BankAccount>>("api/bankaccount");
-			if (bankAccounts == null)
-				return NotFound();
+
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
 			if (User != null) ownUserId = new Guid(_userManager.GetUserId(User));
 
@@ -70,8 +69,6 @@ namespace WebWalletClient.Controllers
 		public async Task<IActionResult> Details(Guid? id)
 		{
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
-			if (transaction == null)
-				return NotFound();
 			return View(transaction);
 		}
 
