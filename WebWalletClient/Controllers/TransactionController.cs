@@ -69,9 +69,6 @@ namespace WebWalletClient.Controllers
 		// GET: Transaction/Details/5
 		public async Task<IActionResult> Details(Guid? id)
 		{
-			if (id == null)
-				return NotFound();
-
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			if (transaction == null)
 				return NotFound();
@@ -83,8 +80,7 @@ namespace WebWalletClient.Controllers
 		{
 			if (TempData?["CustomError"] != null)
 				ModelState.AddModelError(string.Empty, TempData["CustomError"].ToString());
-			if (id == null)
-				return View();
+
 			var bankAccountId = new Guid(id);
 			var transactionViewModel = new TransactionViewModel
 			{
@@ -128,7 +124,7 @@ namespace WebWalletClient.Controllers
 				}
 			}
 			await Utils.Put<BankAccount>("api/bankaccount/" + bankAccount.Id, bankAccount);
-			var transaction = Utils.Post<Transaction>("api/transaction/", transactionViewModel).Result;
+			await Utils.Post<Transaction>("api/transaction/", transactionViewModel);
 
 
 			return RedirectToAction("Index", new { id = transactionViewModel.BankAccountId });
@@ -137,9 +133,6 @@ namespace WebWalletClient.Controllers
 		// GET: Transaction/Edit/5
 		public async Task<IActionResult> Edit(Guid? id)
 		{
-			if (id == null)
-				return NotFound();
-
 			var transaction = await Utils.Get<Transaction>("api/transaction/" + id);
 
 			var transactionViewModel = new TransactionViewModel
@@ -165,7 +158,7 @@ namespace WebWalletClient.Controllers
 			if (!ModelState.IsValid) return View(transactionViewModel);
 			var oldTransaction = await Utils.Get<Transaction>("api/transaction/" + id);
 			oldTransaction.Comment = transactionViewModel.Comment;
-			var transaction = Utils.Put<Transaction>("api/transaction/" + oldTransaction.BankAccountId.ToString(), oldTransaction).Result;
+			await Utils.Put<Transaction>("api/transaction/" + oldTransaction.BankAccountId, oldTransaction);
 
 			return RedirectToAction("Index", new { id = transactionViewModel.BankAccountId });
 		}
