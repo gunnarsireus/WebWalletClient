@@ -164,7 +164,7 @@ namespace WebWalletClient.Tests
             {
                 BankAccountId = bankAccountId,
                 Amount = "100",
-                Deposition = true
+                IsDeposition = true
             };
             result = await transactionController.Create(transactionViewModel);
 
