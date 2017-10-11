@@ -40,7 +40,7 @@ namespace WebWalletClient.Controllers
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
 			if (User != null) ownUserId = new Guid(_userManager.GetUserId(User));
 			bankAccounts = bankAccounts.Where(o => o.OwnerId == ownUserId).ToList();
-			var bankAccountsViewModels = bankAccounts.Select(bankAccount => new BankAccountViewModel
+			var bankAccountViewModels = bankAccounts.Select(bankAccount => new BankAccountViewModel
 				{
 					Id = bankAccount.Id,
 					Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -51,7 +51,7 @@ namespace WebWalletClient.Controllers
 					Transactions = bankAccount.Transactions
 				})
 				.ToList();
-			return View(bankAccountsViewModels);
+			return View(bankAccountViewModels);
 		}
 
 		// GET: BankAccount/Details/5
@@ -64,7 +64,7 @@ namespace WebWalletClient.Controllers
 			if (bankAccount == null)
 				return NotFound();
 
-			var bankAccountsViewModel = new BankAccountViewModel
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -76,7 +76,7 @@ namespace WebWalletClient.Controllers
 			};
 
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// GET: BankAccount/Create
@@ -112,7 +112,7 @@ namespace WebWalletClient.Controllers
 
 			if (bankAccount == null)
 				return NotFound();
-			var bankAccountsViewModel = new BankAccountViewModel
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -124,7 +124,7 @@ namespace WebWalletClient.Controllers
 			};
 
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// POST: BankAccount/Edit/5
@@ -158,7 +158,7 @@ namespace WebWalletClient.Controllers
 			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 			if (bankAccount == null)
 				return NotFound();
-			var bankAccountsViewModel = new BankAccountViewModel
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -169,7 +169,7 @@ namespace WebWalletClient.Controllers
 				Transactions = bankAccount.Transactions
 			};
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// POST: BankAccount/Delete/5
