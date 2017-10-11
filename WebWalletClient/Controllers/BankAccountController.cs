@@ -129,7 +129,7 @@ namespace WebWalletClient.Controllers
 
 			oldBankAccount.Comment = bankAccountViewModel.Comment;
 			oldBankAccount.InterestRate = bankAccountViewModel.InterestRate;
-			await Utils.Put<BankAccount>($"api/bankaccount/" + oldBankAccount.Id, oldBankAccount);
+			await Utils.Put<BankAccount>("api/bankaccount/" + oldBankAccount.Id, oldBankAccount);
 
 			return RedirectToAction(nameof(Index));
 		}
