@@ -3,24 +3,33 @@
     ViewData["Title"] = "Transaktioner";
 }
 <h2>Transaktioner</h2>
-<table>
-    <tr class="page-header">Transaktioner f&#246;r konto:</tr>
-    <tr>
-        <td class="table-footnote">
-            @Html.DropDownList("TransactionsForBankAccount", Model.BankAccounts, new { onchange = "ShowTransactions()" })
-        </td>
-    </tr>
-</table>
+
 <script type="text/javascript">
     function ShowTransactions() {
         window.location = "/Transaction/Index/" + $('#TransactionsForBankAccount').val();
     }
 </script>
-@{var createString = "Create/" + ViewBag.BankAccountId; }
-<p>
-    <a asp-action="@createString">Skapa ny</a>
-</p>
-
+@{
+    if (ViewBag.BankAccountId != null)
+    {
+        <table>
+            <tr class="page-header">Transaktioner f&#246;r konto:</tr>
+            <tr>
+                <td class="table-footnote">
+                    @Html.DropDownList("TransactionsForBankAccount", Model.BankAccountSelectList, new { onchange = "ShowTransactions()" })
+                </td>
+            </tr>
+        </table>
+        var createString = "Create/" + ViewBag.BankAccountId;
+    <p>
+        <a asp-action="@createString">Skapa ny</a>
+    </p>
+    }
+    else
+    {
+        <p>Bankkonton saknas</p>
+    }
+}
 
 
 <table class="table">

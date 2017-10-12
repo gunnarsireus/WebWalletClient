@@ -15,6 +15,6 @@ namespace WebWalletClient.Models.TransactionViewModel
         public string Amount { get; set; }
 
         [Display(Name = "Insättning (X) eller uttag ()?")]
-        public bool Deposition { get; set; }
+        public bool IsDeposition { get; set; }
     }
 }

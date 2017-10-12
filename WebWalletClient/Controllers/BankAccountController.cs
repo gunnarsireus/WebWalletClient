@@ -35,14 +35,11 @@ namespace WebWalletClient.Controllers
 		public async Task<IActionResult> Index()
 		{
 			var bankAccounts = await Utils.Get<List<BankAccount>>("api/bankaccount");
-			if (bankAccounts == null)
-				return NotFound();
+
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
 			if (User != null) ownUserId = new Guid(_userManager.GetUserId(User));
 			bankAccounts = bankAccounts.Where(o => o.OwnerId == ownUserId).ToList();
-			var bankAccountsViewModels = new List<BankAccountViewModel>();
-			foreach (var bankAccount in bankAccounts)
-				bankAccountsViewModels.Add(new BankAccountViewModel
+			var bankAccountViewModels = bankAccounts.Select(bankAccount => new BankAccountViewModel
 				{
 					Id = bankAccount.Id,
 					Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -51,21 +48,17 @@ namespace WebWalletClient.Controllers
 					CreationTime = bankAccount.CreationTime,
 					InterestRate = bankAccount.InterestRate,
 					Transactions = bankAccount.Transactions
-				});
-			return View(bankAccountsViewModels);
+				})
+				.ToList();
+			return View(bankAccountViewModels);
 		}
 
 		// GET: BankAccount/Details/5
 		public async Task<IActionResult> Details(Guid? id)
 		{
-			if (id == null)
-				return NotFound();
-
 			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
-			if (bankAccount == null)
-				return NotFound();
 
-			var bankAccountsViewModel = new BankAccountViewModel
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -77,7 +70,7 @@ namespace WebWalletClient.Controllers
 			};
 
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// GET: BankAccount/Create
@@ -96,27 +89,19 @@ namespace WebWalletClient.Controllers
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
 			if (User != null) ownUserId = new Guid(_userManager.GetUserId(User));
 			bankAccount.OwnerId = ownUserId;
-			if (ModelState.IsValid)
-			{
-				bankAccount.Id = Guid.NewGuid();
-				var response = await Utils.Post<BankAccount>("api/bankaccount/", bankAccount);
+			if (!ModelState.IsValid) return View(bankAccount);
+			bankAccount.Id = Guid.NewGuid();
+			await Utils.Post<BankAccount>("api/bankaccount/", bankAccount);
 
-				return RedirectToAction(nameof(Index));
-			}
-			return View(bankAccount);
+			return RedirectToAction(nameof(Index));
 		}
 
 		// GET: BankAccount/Edit/5
 		public async Task<IActionResult> Edit(Guid? id)
 		{
-			if (id == null)
-				return NotFound();
-
 			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 
-			if (bankAccount == null)
-				return NotFound();
-			var bankAccountsViewModel = new BankAccountViewModel
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -128,7 +113,7 @@ namespace WebWalletClient.Controllers
 			};
 
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// POST: BankAccount/Edit/5
@@ -139,33 +124,22 @@ namespace WebWalletClient.Controllers
 		public async Task<IActionResult> Edit(Guid id,
 			[Bind("Id,CreationTime,InterestRate,Comment,Balance")] BankAccountViewModel bankAccountViewModel)
 		{
-			if (id != bankAccountViewModel.Id)
-				return NotFound();
+			if (!ModelState.IsValid) return View(bankAccountViewModel);
+			var oldBankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
 
-			if (ModelState.IsValid)
-			{
-				var oldBankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
-				if (oldBankAccount == null)
-					return NotFound();
-				oldBankAccount.Comment = bankAccountViewModel.Comment;
-				oldBankAccount.InterestRate = bankAccountViewModel.InterestRate;
-				oldBankAccount = await Utils.Put<BankAccount>($"api/bankaccount/0", oldBankAccount);
+			oldBankAccount.Comment = bankAccountViewModel.Comment;
+			oldBankAccount.InterestRate = bankAccountViewModel.InterestRate;
+			await Utils.Put<BankAccount>("api/bankaccount/" + oldBankAccount.Id, oldBankAccount);
 
-				return RedirectToAction(nameof(Index));
-			}
-			return View(bankAccountViewModel);
+			return RedirectToAction(nameof(Index));
 		}
 
 		// GET: BankAccount/Delete/5
 		public async Task<IActionResult> Delete(Guid? id)
 		{
-			if (id == null)
-				return NotFound();
-
 			var bankAccount = await Utils.Get<BankAccount>("api/bankaccount/" + id);
-			if (bankAccount == null)
-				return NotFound();
-			var bankAccountsViewModel = new BankAccountViewModel
+
+			var bankAccountViewModel = new BankAccountViewModel
 			{
 				Id = bankAccount.Id,
 				Username = GetUserNameFromId(bankAccount.OwnerId),
@@ -176,7 +150,7 @@ namespace WebWalletClient.Controllers
 				Transactions = bankAccount.Transactions
 			};
 
-			return View(bankAccountsViewModel);
+			return View(bankAccountViewModel);
 		}
 
 		// POST: BankAccount/Delete/5
@@ -185,7 +159,7 @@ namespace WebWalletClient.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteConfirmed(Guid id)
 		{
-			var bankAccount = await Utils.Delete<BankAccount>("api/bankaccount/" + id);
+			await Utils.Delete<BankAccount>("api/bankaccount/" + id);
 			return RedirectToAction(nameof(Index));
 		}
 
