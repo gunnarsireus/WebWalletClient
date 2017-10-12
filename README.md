@@ -48,7 +48,6 @@ kunna köras felfritt.
 Köra programmet
 Hämta koden från github, öppna med Visual Studio 2017. När koden är öppnad tryck F5 för att 
 köra i debuggläge. Starta först WebWalletAPI. En browser öppnas och Swagger startar.
-skrivs ut.
 
 Därefter tryck F5 i WebWalletClient. När programmet har öppnat, registrera dig som användare 
 av WebWallet. Nu kan du börja skapa bankkonton och registrera transaktioner på bankkonton. 
