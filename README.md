@@ -1,4 +1,27 @@
 # WebWalletClient
+Background
+You want to create your online wallet service to which everyone can register and keep track of their hard earned money.
+ 
+Assignment
+The task is to create a web service with a frontend where you should be able to keep track of your money.
+ 
+The service should meet the following criteria;
+•	A user should be able to sign up for the service using his/her email-address and a password
+•	A user must log in before he/she can use the service
+•	In the service you should be able to:
+o	Show the current balance and a list of withdrawals/deposits together with timestamps for each action.
+o	Deposit money and provide a comment to a deposit.
+o	Withdraw money and provide a comment to a withdrawal.
+ 
+It should not be possible to end up withdrawing more money than your balance.
+ 
+Requirements
+The assignment should be written in C# MVC with unit tests where you see fit.
+For data storage you should use any portable format, i.e. a flat file or a lightweight database.
+
+**********************************************************************************************
+
+
 WebWallet instruktioner
 Ambitionen har varit att göra WebWallet-programmet självinstruerande.
  
@@ -24,8 +47,7 @@ kunna köras felfritt.
 
 Köra programmet
 Hämta koden från github, öppna med Visual Studio 2017. När koden är öppnad tryck F5 för att 
-köra i debuggläge. Starta först WebwalletAPI. En browser öppnas och texten ["WebWalletAPI started"] 
-skrivs ut.
+köra i debuggläge. Starta först WebWalletAPI. En browser öppnas och Swagger startar.
 
 Därefter tryck F5 i WebWalletClient. När programmet har öppnat, registrera dig som användare 
 av WebWallet. Nu kan du börja skapa bankkonton och registrera transaktioner på bankkonton. 
