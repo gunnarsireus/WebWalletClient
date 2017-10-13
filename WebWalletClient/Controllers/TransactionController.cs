@@ -23,6 +23,8 @@ namespace WebWalletClient.Controllers
 		// GET: Transaction
 		public async Task<IActionResult> Index(string id)
 		{
+			if (TempData?["Info"] != null)
+				ModelState.AddModelError(string.Empty, TempData["Info"].ToString());
 			var bankAccounts = await Utils.Get<List<BankAccount>>("api/bankaccount");
 
 			var ownUserId = Guid.NewGuid(); //To pass unit test where User=null
@@ -109,6 +111,7 @@ namespace WebWalletClient.Controllers
 			{
 				var deposit = decimal.Parse(transactionViewModel.Amount, new CultureInfo("se-SV"));
 				bankAccount.Balance = (oldBalance + deposit).ToString(new CultureInfo("se-SV"));
+				TempData["Info"] = deposit + " sek har satts in på kontot";
 			}
 			else
 			{
@@ -119,6 +122,7 @@ namespace WebWalletClient.Controllers
 					TempData["CustomError"] = "Saldot får ej bli negativt!";
 					return RedirectToAction("Create", new { id = transactionViewModel.BankAccountId });
 				}
+				TempData["Info"] = withdraw + " sek har tagits ut från kontot";
 			}
 			await Utils.Put<BankAccount>("api/bankaccount/" + bankAccount.Id, bankAccount);
 			await Utils.Post<Transaction>("api/transaction/", transactionViewModel);

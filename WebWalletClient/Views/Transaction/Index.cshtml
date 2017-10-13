@@ -21,9 +21,9 @@
             </tr>
         </table>
         var createString = "Create/" + ViewBag.BankAccountId;
-    <p>
-        <a asp-action="@createString">Skapa ny</a>
-    </p>
+        <p>
+            <a asp-action="@createString">Skapa ny</a>
+        </p>
     }
     else
     {
@@ -31,7 +31,7 @@
     }
 }
 
-
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <table class="table">
     <thead>
         <tr>
