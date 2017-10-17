@@ -1,22 +1,18 @@
 @model WebWalletClient.Models.TransactionViewModel.TransactionViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = Html.Raw("&#196;ndra transaktion");
 }
 
-<h2>&#196;ndra</h2>
+<h2>&#196;ndra transaktion</h2>
 
-<h4>Transaktion</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="BankAccountId" class="control-label"></label>
-                <input asp-for="BankAccountId" class="form-control" readonly="readonly" />
-            </div>
+            <input type="hidden" asp-for="BankAccountId" />
             <div class="form-group">
                 <label asp-for="CreationTime" class="control-label"></label>
                 <input asp-for="CreationTime" class="form-control" readonly="readonly" />
